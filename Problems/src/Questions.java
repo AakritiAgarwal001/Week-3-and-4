@@ -1,41 +1,34 @@
-public class AccountLookup {
-    // Linear Search: Find first occurrence
-    public static int linearSearch(String[] logs, String target) {
+public class RiskThresholds {
+    public static void findRange(int[] sortedRisks, int threshold) {
+        int low = 0, high = sortedRisks.length - 1;
+        int floor = -1, ceiling = -1;
         int comps = 0;
-        for (int i = 0; i < logs.length; i++) {
-            comps++;
-            if (logs[i].equals(target)) {
-                System.out.println("Linear Comps: " + comps);
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    // Binary Search: Find index and count duplicates (Requires Sorted Input)
-    public static void binarySearchWithCount(String[] sortedLogs, String target) {
-        int low = 0, high = sortedLogs.length - 1, comps = 0;
-        int foundIdx = -1;
 
         while (low <= high) {
             comps++;
             int mid = low + (high - low) / 2;
-            int res = target.compareTo(sortedLogs[mid]);
-            if (res == 0) {
-                foundIdx = mid;
+            if (sortedRisks[mid] == threshold) {
+                floor = ceiling = sortedRisks[mid];
                 break;
-            } else if (res > 0) low = mid + 1;
+            } else if (sortedRisks[mid] < threshold) {
+                floor = sortedRisks[mid]; // Potential floor
+                low = mid + 1;
+            } else {
+                ceiling = sortedRisks[mid]; // Potential ceiling
+                high = mid - 1;
+            }
+        }
+        System.out.println("Floor: " + floor + ", Ceiling: " + ceiling + " (Comps: " + comps + ")");
+    }
+
+    // Binary search for insertion point
+    public static int findInsertionPoint(int[] sortedRisks, int newRisk) {
+        int low = 0, high = sortedRisks.length - 1;
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (sortedRisks[mid] < newRisk) low = mid + 1;
             else high = mid - 1;
         }
-
-        if (foundIdx != -1) {
-            // Count occurrences by expanding from foundIdx
-            int count = 0;
-            int temp = foundIdx;
-            while (temp >= 0 && sortedLogs[temp].equals(target)) { count++; temp--; }
-            temp = foundIdx + 1;
-            while (temp < sortedLogs.length && sortedLogs[temp].equals(target)) { count++; temp++; }
-            System.out.println("Binary Index: " + foundIdx + ", Comps: " + comps + ", Count: " + count);
-        }
+        return low; // Index where newRisk should be inserted
     }
 }
