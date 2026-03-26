@@ -1,49 +1,41 @@
-import java.util.*;
+class Client {
+    String name;
+    int riskScore;
+    double balance;
 
-class Transaction {
-    String id;
-    double fee;
-    String ts; // Timestamp
-
-    Transaction(String id, double fee, String ts) {
-        this.id = id; this.fee = fee; this.ts = ts;
+    Client(String name, int riskScore, double balance) {
+        this.name = name; this.riskScore = riskScore; this.balance = balance;
     }
-    public String toString() { return id + ":" + fee + "@" + ts; }
+    public String toString() { return name + "(" + riskScore + ")"; }
 }
 
 public class Questions {
-    // Bubble Sort for small batches (<= 100)
-    public static void bubbleSort(List<Transaction> txs) {
-        int n = txs.size();
-        int swaps = 0, passes = 0;
+    public static void sortAndRank(Client[] clients) {
+        // Bubble Sort ASC for visualization
+        int n = clients.length;
         for (int i = 0; i < n - 1; i++) {
-            boolean swapped = false;
-            passes++;
             for (int j = 0; j < n - i - 1; j++) {
-                if (txs.get(j).fee > txs.get(j + 1).fee) {
-                    Collections.swap(txs, j, j + 1);
-                    swapped = true;
-                    swaps++;
+                if (clients[j].riskScore > clients[j + 1].riskScore) {
+                    Client temp = clients[j];
+                    clients[j] = clients[j + 1];
+                    clients[j + 1] = temp;
                 }
             }
-            if (!swapped) break; // Early termination
         }
-        System.out.println("BubbleSort: " + txs + " // " + passes + " passes, " + swaps + " swaps");
-    }
 
-    // Insertion Sort for medium batches (100-1000)
-    public static void insertionSort(List<Transaction> txs) {
-        for (int i = 1; i < txs.size(); i++) {
-            Transaction key = txs.get(i);
+        // Insertion Sort DESC + Balance (Primary: Risk DESC, Secondary: Balance DESC)
+        for (int i = 1; i < n; i++) {
+            Client key = clients[i];
             int j = i - 1;
-            // Sort by fee, then by timestamp for stability/detail
-            while (j >= 0 && (txs.get(j).fee > key.fee ||
-                    (txs.get(j).fee == key.fee && txs.get(j).ts.compareTo(key.ts) > 0))) {
-                txs.set(j + 1, txs.get(j));
+            while (j >= 0 && (clients[j].riskScore < key.riskScore ||
+                    (clients[j].riskScore == key.riskScore && clients[j].balance < key.balance))) {
+                clients[j + 1] = clients[j];
                 j--;
             }
-            txs.set(j + 1, key);
+            clients[j + 1] = key;
         }
-        System.out.println("InsertionSort (Fee+TS): " + txs);
+
+        System.out.print("Top Risks: ");
+        for (int i = 0; i < Math.min(3, clients.length); i++) System.out.print(clients[i] + " ");
     }
 }
